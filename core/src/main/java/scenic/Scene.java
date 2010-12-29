@@ -81,4 +81,8 @@ public class Scene {
     public void submitAnimation(LinearAnimation pa) {
         animations.add(pa);
     }
+
+    public boolean hasOngoingAnimations() {
+        return animations.size() > 0;
+    }
 }

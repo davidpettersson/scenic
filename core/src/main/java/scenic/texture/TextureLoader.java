@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import android.content.Context;
+import android.opengl.GLUtils;
 import android.util.Log;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -26,20 +27,21 @@ public class TextureLoader {
     }
 
     public Texture loadTextureRepeat(int res) {
-        return loadTexture(res, true, false);
+        return loadTexture(res, true, true);
     }
 
     public Texture loadTexture(int res) {
-        return loadTexture(res, false, false);
+        return loadTexture(res, false, true);
     }
 
     private Texture loadTexture(int res, boolean repeat, boolean isBitmap) {
         if (!textures.containsKey(res)) {
+            final Bitmap bitmap;
             final ByteBuffer textureBuffer;
             final int textureSize;
 
             if (isBitmap) {
-                Bitmap bitmap = loadBitmap(res);
+                bitmap = loadBitmap(res);
                 textureSize = bitmap.getHeight();
                 textureBuffer = ByteBuffer.allocateDirect(textureSize * textureSize * 4);
                 textureBuffer.order(ByteOrder.nativeOrder());
@@ -53,6 +55,7 @@ public class TextureLoader {
                 textureBuffer.order(ByteOrder.nativeOrder());
                 textureBuffer.put(texture);
                 textureBuffer.position(0);
+                bitmap = null; // ugly
             }
 
             // Send to texture memory
@@ -61,9 +64,16 @@ public class TextureLoader {
             int id = ids[0];
 
             glBindTexture(GL_TEXTURE_2D, id);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureSize, textureSize, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureBuffer);
+            
+            if (isBitmap) {
+                GLUtils.texImage2D(GL_TEXTURE_2D, 0, bitmap, 0);
+            } else {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureSize, textureSize, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureBuffer);
+            }
+
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
             if (repeat) {
                 glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
                 glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);

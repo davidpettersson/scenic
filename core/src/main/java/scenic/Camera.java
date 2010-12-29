@@ -19,7 +19,7 @@ public class Camera extends Node {
 
         properties[Property.POS_X.ordinal()] = 0f;
         properties[Property.POS_Y.ordinal()] = 0f;
-        properties[Property.POS_Z.ordinal()] = 9.5f;
+        properties[Property.POS_Z.ordinal()] = 0f;
         properties[Property.LOOK_AT_X.ordinal()] = 0f;
         properties[Property.LOOK_AT_Y.ordinal()] = 0f;
         properties[Property.LOOK_AT_Z.ordinal()] = 0f;
